@@ -109,6 +109,12 @@
   .item input.rn{width:100%;font-size:12px;font-family:'Barlow',sans-serif;border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text)}
   .autobadge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px}
 
+  /* Group sub-header inside a section body (used for the 7.10 / ISO 15085 block) */
+  .grouphead{margin:16px 0 2px;padding:11px 14px;background:#eef4f8;border-left:4px solid var(--accent);border-radius:0 6px 6px 0}
+  .grouphead h4{font-size:18px;color:var(--navy);text-transform:uppercase;letter-spacing:.4px}
+  .grouphead .gs{font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45}
+  .grouphead .gs b{color:var(--navy)}
+
   /* Summary bar */
   .summary{position:sticky;bottom:0;background:var(--navy);color:#fff;border-radius:8px;margin-top:22px;padding:12px 18px;display:flex;gap:22px;flex-wrap:wrap;align-items:center;font-family:'Barlow',sans-serif}
   .summary .n{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px}
@@ -355,7 +361,8 @@
 
 <script>
 /* ---------- checklist content ----------
-   c = clause, r = requirement (HTML allowed), thr = threshold html (optional, uses computed spans), iso = referenced ISO */
+   c = clause, r = requirement (HTML allowed), thr = threshold html (optional, uses computed spans), iso = referenced ISO
+   head = renders a group sub-header band instead of a checklist row (sub = optional sub-line) */
 const S5=[
  {c:"5.2.2.2",r:"Resistance to liquids — external side tested in IRM 901 oil (A) and salt water (B); change in mass per unit area not exceeding 100 g/m² at 70 °C.",iso:"ISO 1817"},
  {c:"5.2.2.3",r:"Ozone resistance — no signs of cracking under 10× magnification after exposure.",iso:"ISO 3011"},
@@ -402,7 +409,27 @@ const S7=[
  {c:"7.9.2.2",r:"Heat test — element inflated to 1,2× working pressure, 60 °C for 6 h, then passes airtightness (7.9.2.4)."},
  {c:"7.9.2.3",r:"Overpressure test — each compartment to 1,5× nominal for 30 min; no damage or rupture; then airtightness."},
  {c:"7.9.2.4",r:"Airtightness test — after 24 h the pressure drop <span class='thr'>≤ <b>20%</b></span> in any compartment (temperature/atmospheric corrections applied)."},
- {c:"7.10",r:"Man-overboard prevention and recovery — complies (Clauses 7, 9, 15, 16).",iso:"ISO 15085:2003"},
+
+ /* ---- 7.10 Man-overboard: ISO 6185-4 §7.10 requires full compliance with ISO 15085:2003.
+         Clause numbers in this block are ISO 15085 clauses, not ISO 6185-4. ---- */
+ {head:"7.10 &nbsp; Man-overboard prevention &amp; recovery",
+  sub:"ISO 6185-4 §7.10 requires full compliance with <b>ISO 15085:2003</b>. Every clause number in this block is an <b>ISO 15085</b> clause — not ISO 6185-4. The RIB is a non-sailing boat, so safety devices are chosen from <b>ISO 15085 Table 3</b> by design category and hull length (the 8,5 m split): the builder selects the option, and devices not part of the chosen option are marked N/A. Jack-line points (device 7) are for sailing boats only."},
+
+ {c:"15085 · 4.1",r:"Working deck defined by the builder — safe access provided to the steering (including emergency steering), strong points, sail/handling area where relevant, the interior and the engine compartment. Working-deck area shown by text or sketch in the owner's manual.",iso:"ISO 15085 · general (cl. 4)"},
+ {c:"15085 · 4.3",r:"Minimum working-deck width at the outer edge — free, continuous and not angled more than 15° from horizontal when upright: <span class='thr'>≥ <b>150 mm</b> cat A/B · ≥ <b>120 mm</b> cat C · ≥ <b>100 mm</b> cat D</span>.",iso:"ISO 15085 · general (cl. 4)"},
+ {c:"15085 · 4.4",r:"Continuity of the working deck — working-deck areas connected (passage through the interior allowed); steps higher than <span class='thr'><b>500 mm</b></span> and obstacles higher or longer than 500 mm avoided.",iso:"ISO 15085 · general (cl. 4)"},
+
+ {c:"15085 · 7",r:"<b>Device 1 — Slip-resistant surface</b> (required, all boats). Working-deck areas slip-resistant; spacing between patches <span class='thr'>≤ <b>75 mm</b> non-glazed · ≤ <b>500 mm</b> glazed</span>. Trampolines/nets forming part of the deck are slip-resistant and support 3 000 N/m².",iso:"ISO 15085 · device 1"},
+ {c:"15085 · 8",r:"<b>Device 2 — Foot-stop</b> (per selected option). Height above adjacent deck (non-sailing) <span class='thr'>≥ <b>25 mm</b> cat A/B · ≥ <b>20 mm</b> cat C</span>; internal face ≤ 30° from vertical (or angled surface ≥ 20° from horizontal on cat C/D); vertical clearance ≤ 40 mm; gaps ≤ 100 mm.",iso:"ISO 15085 · device 2"},
+ {c:"15085 · 9",r:"<b>Device 3 — Handholds</b> (required, all boats). Fitted within 300 mm of the outer edge → placed at least 350 mm above deck; maximum spacing along the outer route <span class='thr'>≤ <b>1,5 m</b></span>; each withstands a horizontal force of <span class='thr'><b>1 500 N</b></span>.",iso:"ISO 15085 · device 3"},
+ {c:"15085 · 10, 11",r:"<b>Device 4 — Low guard-rail / low guard-line</b> (h ≥ 450 mm, per selected option). Surrounds the outer edges of the working deck; intermediate line and gaps per cl. 10; rail/support strength per cl. 11.",iso:"ISO 15085 · device 4"},
+ {c:"15085 · 10–12",r:"<b>Device 5 — High guard-rail / high guard-line</b> (h ≥ 600 mm, per selected option). Intermediate line gap ≤ 300 mm; rail strength <span class='thr'><b>280 N</b> (≤ 50 mm deflection, no permanent set) &amp; <b>560 N</b> no break</span>; stanchion spacing ≤ 2,2 m; guard-line ultimate strength <span class='thr'><b>13 000 N</b> cat A · <b>9 000 N</b> cat B/C</span>.",iso:"ISO 15085 · device 5 (cl. 11, 12)"},
+ {c:"15085 · 13",r:"<b>Device 6 — Hooking points</b> (per selected option). Located within 1 m of the main access hatch/door, within 2 m of every outside steering position, and no more than 3 m apart; accept a 15 mm hook circle; strength <span class='thr'><b>3 600 N</b> cat C · <b>6 000 N</b> cat A/B</span>.",iso:"ISO 15085 · device 6"},
+ {c:"15085 · 14",r:"<b>Device 7 — Jack-line attachment points</b> — required for <i>sailing</i> boats only (ISO 15085 Table 4). Not applicable to a Type IX/X RIB — mark N/A.",iso:"ISO 15085 · device 7 (sailing only)"},
+ {c:"15085 · 15",r:"<b>Device 8 — Body support on high-speed boats</b> (if high-speed: maximum speed &gt; 10·√L<sub>H</sub> or 25 kn, whichever is greater). Either one handhold plus body support, or two handholds grippable together ≥ 200 mm apart; for a seated occupant the support is ≥ 120 mm above the seat.",iso:"ISO 15085 · device 8"},
+ {c:"15085 · 16",r:"<b>Device 9 — Means of reboarding</b> (required, all boats). Reboarding from the water without assistance; if a ladder, the lowest step is <span class='thr'>≥ <b>300 mm</b> below the waterline</span> (minimum sailing condition); readily accessible and usable when in place.",iso:"ISO 15085 · device 9"},
+ {c:"15085 · 17",r:"Owner's-manual items driven by ISO 15085 — working-deck sketch (4.1); guard-line inspection/replacement for UV and chafe (12.1, where guard-lines are fitted); description of the means of reboarding (cl. 16).",iso:"ISO 15085 · cl. 17"},
+
  {c:"7.11",r:"Field of vision from the helm position — conforms.",iso:"ISO 11591"},
  {c:"7.12",r:"Liferaft stowage — provision for liferaft(s) able to carry the crew limit; canister mounted ready, soft bag readily available."},
  {c:"7.13",r:"Self-bailing — cockpit self-drains in <span class='thr'>&lt; 5 min</span> with no more than <span class='thr'>100 mm</span> residual water (test or calc).",iso:"ISO 11812"},
@@ -419,6 +446,9 @@ const S810=[
 /* ---------- render ---------- */
 let idc=0;
 function renderRow(it){
+  if(it.head){
+    return `<div class="grouphead"><h4>${it.head}</h4>${it.sub?`<div class="gs">${it.sub}</div>`:""}</div>`;
+  }
   const id="it"+(idc++);
   return `<div class="item" data-id="${id}">
     <div class="clause">${it.c}</div>
