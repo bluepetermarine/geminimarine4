@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WR-880 CE Assessment — Gemini Marine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f2efe8; --card:#fff; --navy:#1a2e4a; --accent:#1a6fa8; --gold:#c8860a;
+    --ok:#1a7a4a; --warn:#c85a00; --danger:#b02020; --text:#1e2c3a; --muted:#5a7080; --border:#ccd5dc;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  h1,h2,h3,h4{font-family:'Barlow Condensed',sans-serif;margin:0;line-height:1.15;letter-spacing:.3px}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
+  .watermark{position:fixed;inset:0;pointer-events:none;z-index:0;background-repeat:repeat;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='240'%3E%3Ctext x='12' y='180' font-family='Barlow,Arial,sans-serif' font-size='26' font-weight='700' fill='rgb(26,46,74)' fill-opacity='0.05' transform='rotate(-24 12 180)'%3EGEMINI MARINE%3C/text%3E%3C/svg%3E")}
+
+  /* Header */
+  header{background:var(--navy);color:#fff;border-radius:10px;padding:20px 26px;position:relative;overflow:hidden;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  header::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border:14px solid var(--gold);border-radius:50%;opacity:.14}
+  .brand{display:flex;align-items:center;gap:14px;padding-right:22px;border-right:1px solid rgba(255,255,255,.18);position:relative;z-index:1}
+  .emblem{width:80px;height:80px;flex:none;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35))}
+  .brandname{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:27px;text-transform:uppercase;letter-spacing:1px;color:#fff;line-height:1}
+  .brandloc{font-family:'Barlow',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-top:5px}
+  .doc{flex:1;min-width:250px;position:relative;z-index:1}
+  header h1{font-size:29px;font-weight:700;text-transform:uppercase}
+  header .sub{font-family:'Barlow',sans-serif;color:#c9d6e2;font-size:14px;margin-top:4px}
+  header .std{display:inline-block;margin-top:12px;background:var(--gold);color:#241800;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;padding:4px 10px;border-radius:4px}
+  .headrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  .headrow .std{margin-top:0}
+  .projno{display:inline-flex;align-items:center;gap:8px}
+  .projno label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);font-weight:600}
+  .projno input{font-family:'JetBrains Mono',monospace;font-size:14px;padding:5px 10px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.10);color:#fff;border-radius:5px;min-width:150px}
+  .projno input::placeholder{color:#9fb2c4}
+  .projno input:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.16)}
+  .clientbanner{grid-column:1/-1;background:linear-gradient(90deg,#12233b,#1a2e4a);color:#fff;border-radius:8px;padding:11px 16px;font-size:14px;border-left:4px solid var(--gold);margin-top:2px}
+  .clientbanner strong{color:var(--gold)}
+
+  /* Toolbar */
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 8px}
+  button.tool{font-family:'Barlow',sans-serif;font-weight:600;font-size:14px;border:1px solid var(--border);background:#fff;color:var(--navy);padding:8px 14px;border-radius:6px;cursor:pointer}
+  button.tool:hover{border-color:var(--accent);color:var(--accent)}
+  button.tool.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  /* Cards / sections */
+  section.card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-top:18px;overflow:hidden}
+  .card > .head{background:#eef1ee;border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+  .card > .head h2{font-size:21px;color:var(--navy);font-weight:700;flex:1}
+  .card > .head .num{font-family:'JetBrains Mono',monospace;font-weight:700;color:#fff;background:var(--navy);border-radius:5px;padding:3px 9px;font-size:13px}
+  .card > .head .chev{color:var(--muted);font-size:13px;font-family:'Barlow',sans-serif}
+  .card > .body{padding:6px 18px 16px}
+  .card.collapsed > .body{display:none}
+
+  /* Data entry grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 18px;margin-top:10px}
+  .grid .full{grid-column:1/-1}
+  .field label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;margin-bottom:3px}
+  .field input,.field select{width:100%;font-family:'JetBrains Mono',monospace;font-size:14px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:#fbfcfb;color:var(--text)}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--accent);background:#fff}
+  .field .unit{font-family:'Barlow',sans-serif;font-size:11px;color:var(--muted);text-transform:none}
+  .subhead{grid-column:1/-1;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:16px;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;margin:8px 0 -2px;border-bottom:2px solid #e7e2d7;padding-bottom:4px}
+
+  /* Computed results panel */
+  .calc{margin-top:16px;background:#f7f4ec;border:1px solid #e2dccb;border-radius:8px;padding:14px 16px}
+  .calc h3{font-size:17px;color:var(--navy);margin-bottom:8px;text-transform:uppercase}
+  .calc table{width:100%;border-collapse:collapse;font-size:14px}
+  .calc td{padding:6px 8px;border-bottom:1px solid #e7e2d7;vertical-align:top}
+  .calc td:first-child{color:var(--muted);width:52%}
+  .calc td .v{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--navy)}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .badge.ok{background:#e2f2e8;color:var(--ok)}
+  .badge.no{background:#f7e3e3;color:var(--danger)}
+  .badge.na{background:#eceff1;color:var(--muted)}
+  .badge.chk{background:#fdf0d8;color:var(--warn)}
+
+  /* Warning box */
+  .note{border-left:4px solid var(--gold);background:#fdf7ea;padding:12px 16px;border-radius:0 8px 8px 0;margin-top:14px;font-size:14px}
+  .note strong{color:var(--navy)}
+  .deftable{display:grid;gap:8px;background:#eef4f8;border:1px solid #d4e2ec;border-radius:8px;padding:12px 14px;font-size:13.5px;line-height:1.45}
+  .deftable .tt{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff;background:var(--navy);border-radius:4px;padding:1px 8px;margin-right:6px;font-size:13px}
+  .gloss{display:grid;grid-template-columns:1fr 1fr;gap:0 30px;margin-top:4px}
+  .gloss .sub2{grid-column:1/-1;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:16px;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;border-bottom:2px solid #e7e2d7;padding-bottom:4px;margin:12px 0 4px}
+  .gloss .g{padding:7px 0;border-bottom:1px solid #eef0ee;font-size:13.5px;line-height:1.4}
+  .gloss .g b{font-family:'JetBrains Mono',monospace;color:var(--navy);font-weight:700;margin-right:2px}
+  .gloss .g .u{color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace}
+  .warnbox{grid-column:1/-1;display:none;gap:11px;align-items:flex-start;background:#fdf1e6;border:1px solid #f0c9a6;border-left:5px solid var(--warn);border-radius:8px;padding:12px 15px;font-size:13.5px;color:#5a3410;margin-top:2px}
+  .warnbox.show{display:flex}
+  .warnbox .ic{flex:none;width:24px;height:24px}
+  .warnbox strong{color:var(--warn)}
+
+  /* Checklist rows */
+  .item{display:grid;grid-template-columns:64px 1fr 150px;gap:14px;padding:12px 4px;border-bottom:1px solid #eef0ee;align-items:start}
+  .item:last-child{border-bottom:none}
+  .item .clause{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent)}
+  .item .req{font-size:14px}
+  .item .req .thr{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:12px;background:#eef4f8;color:var(--navy);padding:1px 7px;border-radius:4px;margin-top:4px}
+  .item .req .thr b{color:var(--accent)}
+  .item .req .iso{color:var(--muted);font-size:12px}
+  .item .ctl{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+  .seg{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .seg button{border:none;background:#fff;color:var(--muted);font-family:'Barlow',sans-serif;font-weight:600;font-size:12px;padding:5px 9px;cursor:pointer;border-right:1px solid var(--border)}
+  .seg button:last-child{border-right:none}
+  .seg button.on.pass{background:var(--ok);color:#fff}
+  .seg button.on.fail{background:var(--danger);color:#fff}
+  .seg button.on.na{background:var(--muted);color:#fff}
+  .item input.rn{width:100%;font-size:12px;font-family:'Barlow',sans-serif;border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text)}
+  .autobadge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px}
+
+  /* Group sub-header inside a section body (used for the 7.10 / ISO 15085 block) */
+  .grouphead{margin:16px 0 2px;padding:11px 14px;background:#eef4f8;border-left:4px solid var(--accent);border-radius:0 6px 6px 0}
+  .grouphead h4{font-size:18px;color:var(--navy);text-transform:uppercase;letter-spacing:.4px}
+  .grouphead .gs{font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45}
+  .grouphead .gs b{color:var(--navy)}
+
+  /* Summary bar */
+  .summary{position:sticky;bottom:0;background:var(--navy);color:#fff;border-radius:8px;margin-top:22px;padding:12px 18px;display:flex;gap:22px;flex-wrap:wrap;align-items:center;font-family:'Barlow',sans-serif}
+  .summary .n{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px}
+  .summary .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#c9d6e2}
+  .summary .pill{display:flex;flex-direction:column;line-height:1.1}
+
+  footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center}
+
+  /* IMCI submission review */
+  #sec-imci > .head{background:#e9eff6}
+  #sec-imci > .head .num{background:var(--accent)}
+  .imcibar{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;background:#12233b;color:#fff;border-radius:8px;padding:12px 16px;margin-top:10px;border-left:4px solid var(--accent);font-size:14px}
+  .imcibar b{color:#9fd0f2}
+  .imcibar .k{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#9fb2c4;display:block}
+  .tally{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
+  .tally span{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px}
+  .sev{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;display:inline-block}
+  .sev.high{background:#f7e3e3;color:var(--danger)}
+  .sev.med{background:#fdf0d8;color:var(--warn)}
+  .sev.low{background:#e6eef5;color:var(--accent)}
+  .sev.acc{background:#e2f2e8;color:var(--ok)}
+  .rtab{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+  .rtab th{text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);border-bottom:2px solid #e7e2d7;padding:6px 8px}
+  .rtab td{padding:8px;border-bottom:1px solid #eef0ee;vertical-align:top}
+  .rtab td.id{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);white-space:nowrap}
+  .rtab td .fn{color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;word-break:break-word}
+  .rtab td .act{display:block;margin-top:5px;color:var(--navy)}
+  .rtab td .act::before{content:"Action: ";font-weight:700}
+  .evline{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  .evchip{font-family:'JetBrains Mono',monospace;font-size:11px;background:#e6eef5;color:var(--navy);border:1px solid #d4e2ec;border-radius:4px;padding:1px 6px}
+  .evline a{text-decoration:none}
+  .item.flag-high{background:linear-gradient(90deg,#fbeaea 0,#fff 40%)}
+  .item.flag-med{background:linear-gradient(90deg,#fdf4e4 0,#fff 40%)}
+  .wrapx{overflow-x:auto}
+  .verline{margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .vbadge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;background:var(--ok);color:#fff;border-radius:4px;padding:2px 8px}
+  .item.verified{background:linear-gradient(90deg,#e6f4ec 0,#fff 45%)}
+  .sev.closed{background:#eceff1;color:var(--muted);text-decoration:line-through}
+  @media (max-width:720px){.rtab th:nth-child(3),.rtab td:nth-child(3){display:none}}
+
+  @media (max-width:720px){
+    .grid{grid-template-columns:1fr 1fr}
+    .gloss{grid-template-columns:1fr}
+    .item{grid-template-columns:52px 1fr;grid-template-areas:"c r" "n n" "ctl ctl"}
+    .item .clause{grid-area:c}.item .req{grid-area:r}.item .ctl{grid-area:ctl;align-items:flex-start}
+  }
+  @media print{
+    body{background:#fff}
+    .toolbar,.summary,.chev{display:none}
+    .card.collapsed > .body{display:block}
+    section.card,header,.calc{break-inside:avoid}
+    .item{break-inside:avoid}
+    header::after{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="watermark" aria-hidden="true"></div>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <svg class="emblem" viewBox="0 0 100 100" role="img" aria-label="Gemini Marine emblem">
+        <circle cx="50" cy="50" r="48" fill="#12233b"/>
+        <circle cx="50" cy="50" r="47" fill="none" stroke="#c8860a" stroke-width="1.3"/>
+        <circle cx="50" cy="50" r="33" fill="none" stroke="#c8860a" stroke-width="0.7" opacity=".4"/>
+        <g stroke="#c8860a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="41" y1="33" x2="41" y2="67"/>
+          <line x1="59" y1="33" x2="59" y2="67"/>
+          <path d="M32 33 Q50 24 68 33"/>
+          <path d="M32 67 Q50 76 68 67"/>
+        </g>
+        <text x="50" y="90" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="10" font-weight="700" letter-spacing="2" fill="#c8860a">GM</text>
+      </svg>
+      <div class="brandtext">
+        <div class="brandname">Gemini&nbsp;Marine</div>
+        <div class="brandloc">Since&nbsp;1979</div>
+      </div>
+    </div>
+    <div class="doc">
+      <h1>RIB CE Assessment Checklist — WAVERIDER WR-880</h1>
+      <div class="sub">Rigid inflatable boats, hull length 8 m to 24 m, motor power 15 kW and greater &nbsp;•&nbsp; Type IX &amp; Type X</div>
+      <div class="headrow">
+        <div class="std">EN ISO 6185-4:2018 (ISO 6185-4:2011, corr. 2014-08-01)</div>
+        <div class="projno"><label for="projHead">Project no.</label><input id="projHead" placeholder="—"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="tool primary" onclick="window.print()">Print / Save as PDF</button>
+    <button class="tool" onclick="exportState()">Export data (file)</button>
+    <button class="tool" onclick="document.getElementById('importFile').click()">Import data (file)</button>
+    <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importState(this)">
+    <button class="tool" onclick="expandAll(true)">Expand all</button>
+    <button class="tool" onclick="expandAll(false)">Collapse all</button>
+    <button class="tool" onclick="if(confirm('Clear all statuses and notes?')){clearStatuses()}">Clear statuses</button>
+  </div>
+  <div style="font-size:12px;color:var(--muted);margin:2px 2px 0">Entries save automatically in this browser. Use Export to keep a copy or move it to another device.</div>
+
+  <!-- ============ IMCI SUBMISSION REVIEW — PROJECT #14389 ============ -->
+  <section class="card" id="sec-imci">
+    <div class="head" onclick="toggle(this)"><span class="num">IMCI</span><h2>Project #14389 — WR-880 submission review</h2><span class="chev">click to collapse</span></div>
+    <div class="body">
+      <div class="imcibar">
+        <div><span class="k">Reviewed by</span><b>IMCI International Marine Certification Institute</b></div>
+        <div><span class="k">Builder</span>Gemini Marine (Pty) Ltd</div>
+        <div><span class="k">Craft</span>WAVERIDER WR-880 · Type X · Cat B</div>
+        <div><span class="k">Package received</span>18 Oct 2026</div>
+        <div><span class="k">Annex III</span><b>CAIIIGEMI002</b> · 23 Mar 2026</div>
+        <div><span class="k">Review status</span><b>Open — items outstanding</b></div>
+      </div>
+
+      <div class="note" style="margin-top:12px">
+        <strong>What this section is.</strong> Gemini Marine's completed checklist (printed 23 Sep 2026) and its supporting documents were received under project #14389.
+        The checklist entries below were loaded exactly as Gemini submitted them. IMCI's review is recorded here: each checklist row shows the documents received against it, and rows with open findings are shaded and tagged (F1, F2 …).
+        A Pass entered by the builder stays a builder's declaration until the matching finding is closed. Rows shaded green with <span class="vbadge">✓ Verified by IMCI on Annex III</span> are covered by IMCI Confirmation CAIIIGEMI002.
+        <div style="margin-top:10px"><button class="tool primary" onclick="if(confirm('Replace the entries in this browser with the WR-880 submission as received?')){loadSubmission()}">Load WR-880 submission into checklist</button></div>
+      </div>
+
+      <div class="tally">
+        <span class="sev high">3 high</span><span class="sev med">5 medium</span><span class="sev low">5 low</span><span class="sev closed">3 closed</span>
+        <span class="vbadge">13 clauses verified by IMCI on Annex III</span>
+        <span class="sev acc">Builder declared: 52 Pass · 11 N/A · 0 Fail (63 items)</span>
+      </div>
+
+      <h3 style="font-size:18px;color:var(--navy);text-transform:uppercase;margin-top:16px">Documents received</h3>
+      <div class="wrapx"><table class="rtab">
+        <tr><th>Ref</th><th>Document</th><th>Clauses</th><th>IMCI status</th></tr>
+        <tr><td class="id">D10</td><td><b>IMCI Confirmation CAIIIGEMI002 with Annex (Annex III, partly completed boat)</b>. Issued 23 Mar 2026 for the 2026 model. Records L<sub>H</sub> 8,80 m, B<sub>H</sub> 2,95 m, m<sub>LDC</sub> 4 866 kg, maximum engine power 356 kW, 16 persons and a maximum load of 1 280 kg. Verified items: principal data (ISO 8666:2020); structure 3.1 (ISO 12215-5:2019, ISO 6185-4); stability and freeboard 3.2; buoyancy and flotation 3.3; openings 3.4; flooding 3.5 (all ISO 6185-4); maximum load 3.6 (ISO 14946:2021); anchoring, mooring and towing 3.9 (ISO 15084:2018).<div class="fn">26-GAIIIGEMI002-01.pdf</div></td><td>Data, 5.5, 6.4, 6.5, 6.7, 6.14, 7.1, 7.4, 7.5, 7.6.1, 7.6.3, 7.7, 7.13, 7.15</td><td><span class="vbadge">Verified by IMCI</span></td></tr>
+        <tr><td class="id">D1</td><td>ISO 6185-4 CE Assessment Checklist — Gemini Marine (19 pp, printed 23 Sep 2026; assessment date 13 Aug 2026)<div class="fn">ISO 6185-4 CE Assessment Checklist — Gemini Marine.pdf</div></td><td>All</td><td><span class="sev acc">Loaded</span></td></tr>
+        <tr><td class="id">D2</td><td>WR 880 ISO 12215-5 scantling calculations summary — Du Toit Yacht Design, 04 Dec 2023 (ISO 12215-5:2019; 3 bottom panels, 4 bottom stiffeners)<div class="fn">WR 880 ISO 12215-5 (04Dec2023)_Binded.pdf</div></td><td>5.5, 7.15</td><td><span class="vbadge">Covered by D10</span></td></tr>
+        <tr><td class="id">D3</td><td>Transom Letter of Compliance — DTYD, 12 Aug 2026. Twin 300 HP outboards (447 kW combined), combined engine mass ≤ 625 kg<div class="fn">Structure Detail/07_WR 880 Transom Letter of Compliance (12Aug2026).pdf</div></td><td>6.4</td><td><span class="sev acc">Accepted</span> <span class="sev high">drives F1</span></td></tr>
+        <tr><td class="id">D4</td><td>Structure drawings — 03 hull through-section &amp; laminate detail; 04 and 06 general structure; backbone detail WR880-100 Rev 1<div class="fn">Structure Detail/03_… · 04_… · 06_… · WR - 880 Backbone Detail_Rev_1.pdf</div></td><td>5.5, 7.15</td><td><span class="sev low">Reference</span></td></tr>
+        <tr><td class="id">D5</td><td>Backbone buoyancy detail WR-880-100 p5/7 — PU foam (RF1211 &amp; Resinate 200) 0,46 m³; watertight volume 0,34 m³<div class="fn">Structure Detail/05_WR-880_Buoyancy Detail.pdf</div></td><td>5.7, 7.6.1</td><td><span class="vbadge">Covered by D10</span></td></tr>
+        <tr><td class="id">D6</td><td>ISO 11812:2020 compliance report Rev 0 — recess drainage, sill height, recess bottom height (M. Robertson, 28 Aug 2026). Draining time 4,89 min ≤ 5,00 min; sill 0,46 m; H<sub>B</sub> 0,19 m<div class="fn">Deck Drainage/WR-880_ISO_11812-2020_Compliance_Report_Rev_0.pdf</div></td><td>7.13</td><td><span class="vbadge">Covered by D10</span> <span class="sev low">F7</span></td></tr>
+        <tr><td class="id">D7</td><td>ISO 11105:2020 fuel-tank-bay ventilation sizing Rev 0 (28 Aug 2026) — 1 inlet + 1 exhaust, ≥ 75 mm ID; ventilation general detail drawing; backbone general detail; 3 layout renders<div class="fn">Ventilation/Design Layout/*.pdf, WR-880_Ventilation (1–3).png</div></td><td>6.11</td><td><span class="sev high">Open · F2</span></td></tr>
+        <tr><td class="id">D8</td><td>Ventilation clearance check photos (6)<div class="fn">Ventilation/Checking Clearences/Check_1 (1–3).jpeg, IMG_8968/8973/8974.jpeg</div></td><td>6.11</td><td><span class="sev low">Reference</span></td></tr>
+        <tr><td class="id">D9</td><td>WR-880 300 L fuel tank 350-000-031 — aluminium 5083-H111, 1 700 × 640 × 300 mm, Ø38,1 filler, Ø16 breather; petrol fuel tank typical detail 350/0<div class="fn">Fuel Tanks/350-000-031_WR880_300L_TANK_GENERAL DETAIL.pdf · Petrol Fuel Tank_Typical Detail.pdf</div></td><td>6.10.2</td><td><span class="sev med">Comments · F11</span></td></tr>
+      </table></div>
+
+      <h3 style="font-size:18px;color:var(--navy);text-transform:uppercase;margin-top:20px">IMCI findings</h3>
+      <div class="wrapx"><table class="rtab">
+        <tr><th>Ref</th><th>Finding</th><th>Clauses</th><th>Severity</th></tr>
+        <tr><td class="id">F1</td><td><b>Motor power and top speed are wrong, so the manoeuvring test applies.</b> The checklist gives fitted power as “2” kW and top speed as 40 km/h. The transom letter (D3) gives 2 × 300 HP = 447 kW, which is above P<sub>calc</sub> = 322,4 kW. The scantling summary (D2) gives a service speed of 40 kn (≈ 74 km/h), which is above the 48 km/h trigger. Either one makes the 7.3 maximal manoeuvring-speed test mandatory. “Put sticker” does not close 7.3. <b>447 kW is also above the 356 kW maximum engine power verified on Annex III CAIIIGEMI002</b>, so the twin 300 HP installation is outside what IMCI confirmed.<span class="act">Correct the power and speed fields. Either limit the installed power to ≤ 356 kW or apply for an Annex III revision covering 447 kW. Supply the quick-turn or avoidance-line test record, the ISO 7010 W001 label, and evidence of the speed-measuring device.</span></td><td>7.2, 7.3</td><td><span class="sev high">High</span></td></tr>
+        <tr><td class="id">F2</td><td><b>The ventilation sizing uses a tank volume that does not match the tank drawing.</b> The ventilation report (D7) deducts 0,614 m³ for the fuel tank. The 300 L tank on drawing 350-000-031 (D9) has an outer envelope of 1,700 × 0,640 × 0,300 = 0,326 m³. With 0,326 m³, the net volume is about 0,794 m³, the required area is A = 3 300·ln(0,794/0,14) ≈ 5 725 mm², and the minimum ID is about 85,4 mm. On that basis both 75 mm and 80 mm fail. Clauses 4.13 (terminal fittings) and 5.2 (exhaust in the lower third) are also still “to be confirmed”.<span class="act">Explain where 0,614 m³ comes from or re-issue the calculation. Confirm the as-built duct ID (≥ 90 mm if 0,326 m³ is correct), the terminal-fitting area and the exhaust pick-up height.</span></td><td>6.11</td><td><span class="sev high">High</span></td></tr>
+        <tr style="opacity:.6"><td class="id">F3</td><td><b>Total buoyant volume has a near-zero margin and its breakdown is missing.</b> V = 6,48 m³ is declared against 6,472 m³ required, a margin of 0,008 m³ (0,1 %). The tube (4,52) plus foam (0,46) plus watertight volume (0,34) from D5 add up to 5,32 m³, which leaves 1,16 m³ unaccounted for. If 5,32 m³ is the real total, 7.6.1 fails.<span class="act">Supply the buoyancy calculation (Annex III) with each item listed: tube, foam, sealed volumes and buoyant structure.</span></td><td>7.6.1, 5.7</td><td><span class="sev closed">Closed</span><span class="act" style="font-size:12px">Buoyancy and flotation (3.3) verified by IMCI on Annex III.</span></td></tr>
+        <tr><td class="id">F4</td><td><b>Remote steering is marked N/A.</b> A twin-outboard Type X RIB with a console has remote steering, and 6.6 requires conformity to ISO 8848 or ISO 10592 plus manufacturer approval for Type X.<span class="act">Change to Pass or Fail and supply the steering system make, model and its conformity evidence.</span></td><td>6.6</td><td><span class="sev high">High</span></td></tr>
+        <tr><td class="id">F5</td><td><b>Hull length is not consistent across documents.</b> Annex III CAIIIGEMI002 verifies L<sub>H</sub> = 8,80 m and B<sub>H</sub> = 2,95 m, so 8,80 m stands and the ISO 15085 option is the one for L<sub>H</sub> ≥ 8,5 m. The values below are what still needs correcting. The checklist gives L<sub>H</sub> = 8,80 m. The ISO 11812 report (D6) gives L<sub>H</sub> = 7,88 m and B<sub>H</sub> = 2,22 m. D2 gives LOA 8,8 m and LWL 7,48 m. The difference matters for ISO 15085 Table 3, which splits at 8,5 m and therefore decides which man-overboard option applies.<span class="act">Re-issue the ISO 11812 report with L<sub>H</sub> 8,80 m to match Annex III. Use the Annex III values on the builder's plate.</span></td><td>Data, 7.10, 8</td><td><span class="sev low">Low</span></td></tr>
+        <tr><td class="id">F6</td><td><b>Total tube length is entered as 8,80 m.</b> L<sub>T</sub> is the tube length on all sides added together, probably about 17–18 m. With L<sub>T</sub> = 8,80 m the attachment test mass works out at 414,7 kg. With about 17,6 m it would be about 207 kg. A test at 414,7 kg is conservative and would still be acceptable.<span class="act">Correct L<sub>T</sub> and state the test mass actually used for the 7.14 drop/slide test, with the test record.</span></td><td>7.14</td><td><span class="sev med">Medium</span></td></tr>
+        <tr><td class="id">F7</td><td><b>Drainage has passed the numbers but the report is not closed.</b> D6 (Rev 0) states that quick-draining status “cannot be declared” until action A1 (basis for the 0,60 m sill criterion) and action A3 (clause 6.2 watertightness schedule for appliances in the recess) are closed. The draining-time margin is small (4,89 min against 5,00 min).<span class="act">Flooding (3.5) is verified by IMCI on Annex III. For the technical file, close A1 and A3 and issue Rev 1 of the drainage report.</span></td><td>7.13</td><td><span class="sev low">Low</span></td></tr>
+        <tr style="opacity:.6"><td class="id">F8</td><td><b>The scantling summary needs to be re-issued.</b> In D2 the stiffener table enters the displacement as 10 728 (the lb value) in a kg field, and column D mixes imperial values in metre fields (28,87 / 7,22). The particulars show service speed as both 45 kn and 40 kn. Only bottom panels and stiffeners were assessed. The summary also recommends an extra CSM300 on the webs of stiffeners A and B.<span class="act">Re-issue with consistent units. Add the side, deck and transom-area panels or reference them, and confirm the extra CSM300 is in the production laminate.</span></td><td>7.15</td><td><span class="sev closed">Closed</span><span class="act" style="font-size:12px">Structure (3.1) verified by IMCI on Annex III (ISO 12215-5:2019). For the technical file, keep a clean copy of the scantling report.</span></td></tr>
+        <tr><td class="id">F9</td><td><b>Fire protection is marked N/A.</b> The craft has a permanently installed 300 L petrol tank and 447 kW of outboard power. ISO 9094 is normally applicable.<span class="act">Give the basis for N/A, or assess against ISO 9094 (extinguisher provision, sizing and location).</span></td><td>6.13</td><td><span class="sev med">Medium</span></td></tr>
+        <tr><td class="id">F10</td><td><b>The ISO 15085 option is not stated.</b> Devices 2, 4, 5 and 6 are marked N/A without saying which Table 3 option (non-sailing, Cat B) was chosen. Annex III fixes L<sub>H</sub> at 8,80 m, so the option must be the one for L<sub>H</sub> ≥ 8,5 m.<span class="act">State the selected option and the hull length used to choose it.</span></td><td>7.10 (15085)</td><td><span class="sev med">Medium</span></td></tr>
+        <tr><td class="id">F11</td><td><b>The fuel system has a drawing only.</b> D9 gives the tank geometry and material, but nothing shows conformity to ISO 21487 (pressure test, marking, information plate) or ISO 10088 (hoses, filler, vent, earthing). The ventilation report quotes 0,614 m³, which does not match this tank (F2).<span class="act">Supply the tank pressure-test record, a photo of the tank label, and the hose and filler specification.</span></td><td>6.10.2</td><td><span class="sev med">Medium</span></td></tr>
+        <tr><td class="id">F12</td><td><b>Liferaft stowage is marked N/A.</b> For a Category B Type X craft, the basis for this needs to be stated.<span class="act">Show the liferaft stowage provision, or give the reason it does not apply.</span></td><td>7.12</td><td><span class="sev med">Medium</span></td></tr>
+        <tr><td class="id">F13</td><td><b>Most evidence references are internal folder paths, not documents.</b> Examples are “DATA &amp; STANDARDS\35 - ISO Testing Pics &amp; Video”, “ANNEX III's\WR 880\…”, “See Owners Manual” and “See pics - Peter”. None of these files were in the package. This covers the tube-fabric tests (5.2.2.x), tube tests (7.9.2.x), accessory strength (7.16), Annex III, the owner's manual and the builder's plate.<span class="act">Send the referenced files: fabric supplier certificates, test records, Annex III, owner's manual, plate photo, and the ISO 15084 load calculation (.xlsx).</span></td><td>5.2, 7.4–7.9, 7.16, 8–10</td><td><span class="sev low">Low</span></td></tr>
+        <tr><td class="id">F14</td><td><b>Data fields are missing.</b> WIN, the Quality Manager's name and m<sub>T</sub> are blank. Lifting devices (6.12) are marked N/A, so the owner's manual must say the craft has no lifting points.<span class="act">Complete the WIN and Quality Manager fields and confirm 6.12.</span></td><td>Data, 6.12</td><td><span class="sev low">Low</span></td></tr>
+        <tr><td class="id">F15</td><td><b>The assessment date comes before the supporting reports.</b> The checklist is dated 13 Aug 2026, but the drainage and ventilation reports are dated 28 Aug 2026.<span class="act">Re-date the checklist when the open items are closed.</span></td><td>Data</td><td><span class="sev low">Low</span></td></tr>
+        <tr style="opacity:.6"><td class="id">F16</td><td><b>A Notified Body is required.</b> Category B / Type X cannot be assessed under internal production control alone. Stability (7.4) and design and construction need Notified Body involvement under 2013/53/EU.<span class="act">IMCI has issued Annex III CAIIIGEMI002 for the partly completed boat. The completed boat still needs assessment (WIN, plate, manual, MOB, visibility, engines, fuel, electrical, steering, fire, lights and discharge are “not applicable at this stage of construction” on Annex III).</span></td><td>7.4, 7.15</td><td><span class="sev closed">Closed</span></td></tr>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 1: DATA ENTRY ============ -->
+  <section class="card" id="sec-data">
+    <div class="head" onclick="toggle(this)"><span class="num">DATA</span><h2>1 &nbsp; Vessel &amp; assessment data</h2><span class="chev">Fill in first — drives all formulas below</span></div>
+    <div class="body">
+      <div class="grid">
+        <div class="subhead">Identification</div>
+        <div class="clientbanner full">Prepared exclusively for <strong>Gemini Marine</strong> — licensed use only, not transferable to other builders.</div>
+        <div class="field"><label>Vessel model used</label><input id="model" placeholder="e.g. NM 900 RIB"></div>
+        <div class="field"><label>WIN <span class="unit">(Watercraft Identification Number)</span></label><input id="win" placeholder=""></div>
+        <div class="field"><label>Quality Manager</label><input id="surveyor" value=""></div>
+        <div class="field"><label>Assessment date</label><input id="assessDate" type="date"></div>
+        <div class="field"><label>Assessment stage</label><select id="stage"><option>Type assessment</option><option>Production / individual</option><option>Post-completion (consoles/seats)</option></select></div>
+
+        <div class="subhead">Type &amp; category</div>
+        <div class="field"><label>Boat type</label><select id="boatType" onchange="syncCategory();recalc()"><option value="IX">Type IX (P ≥ 15 kW)</option><option value="X">Type X (P ≥ 75 kW)</option></select></div>
+        <div class="field"><label>Design category</label><select id="designCat" onchange="recalc()"><option value="C">C — inshore (Hs ≤ 2 m, BF ≤ 6)</option><option value="D">D — sheltered (Hs ≤ 0,3 m, BF ≤ 4)</option><option value="B">B — offshore (Hs ≤ 4 m, BF ≤ 8)</option></select></div>
+        <div class="field"><label>Drive <span class="unit">(affects 7.2 allowance)</span></label><select id="drive" onchange="recalc()"><option value="prop">Propeller</option><option value="jet">Waterjet (+35% power)</option></select></div>
+
+        <div class="field full">
+          <div class="deftable">
+            <div><span class="tt">Type IX</span> Powered boats fitted with a buoyancy tube covering at least 85% of the port and starboard sides, suitable for inshore and sheltered waters up to and including wind force 6 Beaufort and significant wave heights up to 2 m (design categories C and D), with a hull length between 8 m and 24 m and a motor power rating of 15 kW and greater.</div>
+            <div><span class="tt">Type X</span> Powered boats fitted with a buoyancy tube covering at least 85% of the port and starboard sides, suitable for navigation up to wind force 8 Beaufort and significant wave heights up to 4 m (design category B), with a hull length between 8 m and 24 m and a motor power rating of 75 kW and greater.</div>
+          </div>
+        </div>
+
+        <div class="warnbox full" id="catBwarn">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L22 21 H2 Z" fill="none" stroke="#c85a00" stroke-width="2" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="15" stroke="#c85a00" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="18" r="1.2" fill="#c85a00"/></svg>
+          <div><strong>Design category B — Notified Body required.</strong> A category B (Type X) craft cannot be assessed by internal production control alone. Under the Recreational Craft Directive 2013/53/EU the stability and design-and-construction assessment must involve a Notified Body. Stability is assessed to the latest ISO 12217-1.</div>
+        </div>
+
+        <div class="subhead">Dimensions &amp; masses (per ISO 8666 / ISO 12217-1)</div>
+        <div class="field"><label>L<sub>H</sub> hull length <span class="unit">m</span></label><input id="LH" type="number" step="0.01" oninput="recalc()"></div>
+        <div class="field"><label>L<sub>max</sub> max length <span class="unit">m</span></label><input id="Lmax" type="number" step="0.01" oninput="recalc()"></div>
+        <div class="field"><label>B<sub>max</sub> max beam <span class="unit">m</span></label><input id="Bmax" type="number" step="0.01" oninput="recalc()"></div>
+        <div class="field"><label>m<sub>LC</sub> light craft mass <span class="unit">kg</span></label><input id="mLC" type="number" step="1" oninput="recalc()"></div>
+        <div class="field"><label>m<sub>LDC</sub> loaded mass <span class="unit">kg</span></label><input id="mLDC" type="number" step="1" oninput="recalc()"></div>
+        <div class="field"><label>m<sub>T</sub> mass on trailer <span class="unit">kg</span></label><input id="mT" type="number" step="1" oninput="recalc()"></div>
+        <div class="field"><label>Rated motor power fitted <span class="unit">kW</span></label><input id="Pfitted" type="number" step="0.1" oninput="recalc()"></div>
+        <div class="field"><label>Top speed <span class="unit">km/h</span></label><input id="topSpeed" type="number" step="0.1" oninput="recalc()"></div>
+
+        <div class="subhead">Buoyancy &amp; compartments</div>
+        <div class="field"><label>V total buoyant volume <span class="unit">m³</span></label><input id="Vtotal" type="number" step="0.001" oninput="recalc()"></div>
+        <div class="field"><label>Buoyancy tube volume <span class="unit">m³</span></label><input id="Vtube" type="number" step="0.001" oninput="recalc()"></div>
+        <div class="field"><label>N number of compartments</label><input id="N" type="number" step="1" oninput="recalc()"></div>
+        <div class="field"><label>L<sub>T</sub> total tube length <span class="unit">m</span></label><input id="LT" type="number" step="0.01" oninput="recalc()"></div>
+        <div class="field"><label>L<sub>STS</sub> sample section length <span class="unit">m · you choose, min 0,5</span></label><input id="LSTS" type="number" step="0.01" value="1.0" oninput="recalc()"></div>
+        <div class="field"><label>Longest compartment length <span class="unit">m</span></label><input id="Lcomp" type="number" step="0.01" oninput="recalc()"></div>
+
+        <div class="subhead">Tube material inputs (type-test)</div>
+        <div class="field"><label>d tube diameter <span class="unit">mm</span></label><input id="dtube" type="number" step="1" oninput="recalc()"></div>
+        <div class="field"><label>p nominal pressure <span class="unit">bar</span></label><input id="pnom" type="number" step="0.01" oninput="recalc()"></div>
+      </div>
+
+      <!-- Computed values -->
+      <div class="calc">
+        <h3>Calculated thresholds (auto)</h3>
+        <table>
+          <tr><td>Required total buoyant volume &nbsp; V &gt; 1,33 &times; m<sub>LDC</sub> / 1000 &nbsp;<span class="iso"></span></td>
+              <td><span class="v" id="o_Vmin">—</span> m³ &nbsp; <span id="b_V" class="badge na">—</span></td></tr>
+          <tr><td>Tube volume must be ≥ 50% of required total &nbsp; (≥ 0,5 &times; V<sub>req</sub>)</td>
+              <td><span class="v" id="o_tubeReq">—</span> m³ &nbsp; <span id="b_tube" class="badge na">—</span></td></tr>
+          <tr><td>Minimum compartments &nbsp; N ≥ 5 &nbsp;(7.7)</td>
+              <td><span class="v" id="o_N">—</span> &nbsp; <span id="b_N" class="badge na">—</span></td></tr>
+          <tr><td>Max compartment length ≤ 4 m &nbsp;(7.7)</td>
+              <td><span class="v" id="o_Lcomp">—</span> m &nbsp; <span id="b_Lcomp" class="badge na">—</span></td></tr>
+          <tr><td>Mean compartment volume V/N &nbsp;(each within &plusmn;20%)</td>
+              <td><span class="v" id="o_meanComp">—</span> m³ &nbsp; <span class="iso">band <span id="o_compBand">—</span></span></td></tr>
+          <tr><td>Attachment test mass &nbsp; m<sub>t</sub> = 0,75 &times; (L<sub>STS</sub>/L<sub>T</sub>) &times; m<sub>LDC</sub> &nbsp;(7.14.3)</td>
+              <td><span class="v" id="o_mt">—</span> kg</td></tr>
+          <tr><td>Lifting device design load &nbsp; 6 &times; m<sub>T</sub> &nbsp;(6.12)</td>
+              <td><span class="v" id="o_lift6">—</span> kg-force &nbsp;| test <span class="v" id="o_lift2">—</span> kg</td></tr>
+          <tr><td>Bow rope minimum strength &nbsp; 10 &times; m<sub>LDC</sub> &nbsp;(clause 10)</td>
+              <td><span class="v" id="o_rope">—</span> N &nbsp;| min length <span class="v" id="o_ropeLen">—</span> m</td></tr>
+          <tr><td>Maximal manoeuvring-speed test required? &nbsp; top speed ≥ 48 km/h (26 kn) &nbsp;(7.3)</td>
+              <td><span id="b_man" class="badge na">—</span></td></tr>
+          <tr><td>Static stability route &nbsp;(Table 3, by type)</td>
+              <td><span class="v" id="o_stab" style="font-size:13px">—</span></td></tr>
+          <tr><td>Motor power &nbsp; P<sub>calc</sub> = L<sub>max</sub> &times; B<sub>max</sub> &times; &#8731;m<sub>LC</sub> &nbsp;(7.2)</td>
+              <td><span class="v" id="o_Pcalc">—</span> kW <span class="iso" id="o_Pallow"></span> &nbsp; <span id="b_P" class="badge na">—</span></td></tr>
+          <tr><td>Tear resistance minimum &nbsp; F<sub>t</sub> = 0,375·d·(1,14p + 0,14) &nbsp;(5.2.2.5)</td>
+              <td><span class="v" id="o_Ft">—</span> N &nbsp;<span class="iso">(75 N floor applied)</span></td></tr>
+          <tr><td>Seam strength minimum &nbsp; F<sub>s</sub> = 3,75·d·(1,14p + 0,14) &nbsp;(5.2.2.7)</td>
+              <td><span class="v" id="o_Fs">—</span> N</td></tr>
+        </table>
+      </div>
+
+      <div class="note">
+        <strong>Formula inputs.</strong>
+        The material-test formulas take d as the maximum tube diameter in millimetres and p as the nominal pressure in bar.
+        Tear resistance F<sub>t</sub> takes the greater of the calculated value and the 75 N floor (5.2.2.5); seam strength F<sub>s</sub> is ten times F<sub>t</sub>.
+        The attachment-mass formula matches the worked example in 7.14.3 (10 m boat, 10 000 kg, 20 m tube, 1 m sample gives 375 kg).
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEFINITIONS ============ -->
+  <section class="card">
+    <div class="head" onclick="toggle(this)"><span class="num">REF</span><h2>Symbols &amp; terms — plain-language reference</h2><span class="chev">click to collapse</span></div>
+    <div class="body">
+      <div class="gloss">
+        <div class="sub2">Symbols used in the data fields</div>
+
+        <div class="g"><b>L<sub>H</sub></b> Hull length — length of the rigid hull, measured to ISO 8666 with the tubes at normal pressure. <span class="u">m</span></div>
+        <div class="g"><b>L<sub>max</sub></b> Maximum length — overall length including anything that projects, tubes at normal pressure. <span class="u">m</span></div>
+        <div class="g"><b>B<sub>max</sub></b> Maximum beam — the widest point, tubes at normal pressure. <span class="u">m</span></div>
+        <div class="g"><b>m<sub>LC</sub></b> Light craft mass — the finished boat empty of crew, cargo, fuel and stores (light craft condition, ISO 12217-1). <span class="u">kg</span></div>
+        <div class="g"><b>m<sub>LDC</sub></b> Loaded mass — the boat at its full rated load: crew, stores, fuel, engines, everything (loaded displacement condition, ISO 8666). <span class="u">kg</span></div>
+        <div class="g"><b>m<sub>T</sub></b> Trailer mass — mass of the boat as it sits on a trailer for towing. Used for the lifting-point design load. <span class="u">kg</span></div>
+        <div class="g"><b>P<sub>calc</sub></b> Calculated motor power — the reference maximum engine power for the boat's size, from length, beam and mass. If the fitted power is higher, the manoeuvring-speed test applies. <span class="u">kW</span></div>
+        <div class="g"><b>V</b> Total buoyant volume — the whole volume that keeps the boat afloat: tubes plus any built-in foam, sealed air compartments and buoyant rigid parts. <span class="u">m³</span></div>
+        <div class="g"><b>V<sub>c</sub></b> Compartment volume — the volume of one buoyancy-tube air chamber. <span class="u">m³</span></div>
+        <div class="g"><b>N</b> Number of separate air compartments in the tube. Minimum five.</div>
+        <div class="g"><b>L<sub>T</sub></b> Total tube length — the buoyancy tube on every side of the boat, added together. <span class="u">m</span></div>
+        <div class="g"><b>L<sub>STS</sub></b> Sample tube length — the length of the short off-cut of buoyancy tube used in the attachment strength test. You choose it; minimum 0,5 m. <span class="u">m</span></div>
+        <div class="g"><b>m<sub>t</sub></b> Test weight mass — the weight dropped in the attachment test, worked out from L<sub>STS</sub>, L<sub>T</sub> and m<sub>LDC</sub>. <span class="u">kg</span></div>
+        <div class="g"><b>d</b> Tube diameter — the largest diameter of the buoyancy tube, measured on the straight sections. <span class="u">mm</span></div>
+        <div class="g"><b>p</b> Nominal pressure — the normal working pressure of the tube at 20 °C. <span class="u">bar</span></div>
+        <div class="g"><b>F<sub>t</sub></b> Tear resistance — the minimum tearing force the tube fabric must withstand. <span class="u">N</span></div>
+        <div class="g"><b>F<sub>s</sub></b> Seam strength — the minimum load a tube seam must hold. <span class="u">N</span></div>
+        <div class="g"><b>A<sub>LV</sub></b> Windage area — the side-on area of the hull the wind pushes against, at the loading assessed. Used in the stability check. <span class="u">m²</span></div>
+
+        <div class="sub2">Key terms</div>
+
+        <div class="g"><b>RIB</b> Rigid inflatable boat — a rigid lower hull with a soft buoyancy tube (inflated or foam-filled) along the sides, where the tube gives at least half of the buoyancy the boat needs.</div>
+        <div class="g"><b>Inflatable tube</b> A buoyancy tube split into several separate air chambers, inflated with air, running along both sides.</div>
+        <div class="g"><b>Foam-filled tube</b> A buoyancy tube filled with closed-cell foam instead of air.</div>
+        <div class="g"><b>Crew limit (CL)</b> The largest number of people allowed on board when underway, as shown on the builder's plate.</div>
+        <div class="g"><b>Nominal pressure</b> The correct everyday operating pressure for the tubes at 20 °C.</div>
+        <div class="g"><b>Significant wave height</b> The average height of the highest third of the waves — the standard way sea state is described.</div>
+        <div class="g"><b>Category B — offshore</b> Suited to seas up to 4 m wave height and wind up to Beaufort 8.</div>
+        <div class="g"><b>Category C — inshore</b> Suited to seas up to 2 m and wind up to Beaufort 6.</div>
+        <div class="g"><b>Category D — sheltered</b> Suited to waves up to 0,3 m (occasional 0,5 m) and wind up to Beaufort 4.</div>
+        <div class="g"><b>Type IX</b> RIB with tube covering at least 85% of each side, categories C and D, hull 8–24 m, power 15 kW and greater.</div>
+        <div class="g"><b>Type X</b> RIB with tube covering at least 85% of each side, category B, hull 8–24 m, power 75 kW and greater.</div>
+        <div class="g"><b>Builder's plate</b> The permanent plate on the boat showing category, crew limit, maximum load and tube pressures.</div>
+        <div class="g"><b>WIN</b> Watercraft Identification Number — the boat's unique identifying number.</div>
+        <div class="g"><b>Type test</b> A one-off test on a representative boat or sample that qualifies the model, not repeated on every unit built.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5 MATERIALS ============ -->
+  <section class="card">
+    <div class="head" onclick="toggle(this)"><span class="num">5</span><h2>Materials</h2><span class="chev">click to collapse</span></div>
+    <div class="body" id="s5"></div>
+  </section>
+
+  <!-- ============ SECTION 6 FUNCTIONAL COMPONENTS ============ -->
+  <section class="card">
+    <div class="head" onclick="toggle(this)"><span class="num">6</span><h2>Functional components</h2><span class="chev">click to collapse</span></div>
+    <div class="body" id="s6"></div>
+  </section>
+
+  <!-- ============ SECTION 7 SAFETY REQUIREMENTS ============ -->
+  <section class="card">
+    <div class="head" onclick="toggle(this)"><span class="num">7</span><h2>Safety requirements of the completed boat</h2><span class="chev">click to collapse</span></div>
+    <div class="body" id="s7"></div>
+  </section>
+
+  <!-- ============ SECTIONS 8-10 ============ -->
+  <section class="card">
+    <div class="head" onclick="toggle(this)"><span class="num">8–10</span><h2>Plate, owner's manual &amp; standard equipment</h2><span class="chev">click to collapse</span></div>
+    <div class="body" id="s810"></div>
+  </section>
+
+  <div class="summary">
+    <div class="pill"><span class="n" id="sumPass">0</span><span class="lbl">Pass</span></div>
+    <div class="pill"><span class="n" id="sumFail">0</span><span class="lbl">Fail</span></div>
+    <div class="pill"><span class="n" id="sumNa">0</span><span class="lbl">N/A</span></div>
+    <div class="pill"><span class="n" id="sumPend">0</span><span class="lbl">Pending</span></div>
+    <div class="pill"><span class="n" id="sumTot">0</span><span class="lbl">Total items</span></div>
+  </div>
+
+  <footer>Prepared exclusively for Gemini Marine. RIB CE assessment checklist based on EN ISO 6185-4:2018 — this tool records the Quality Manager's findings and does not replace the text of the standard. Licensed to Gemini Marine; not transferable.<br>Project #14389 submission review by IMCI International Marine Certification Institute — package received 18 Oct 2026.</footer>
+</div>
+
+<script>
+/* ---------- checklist content ----------
+   c = clause, r = requirement (HTML allowed), thr = threshold html (optional, uses computed spans), iso = referenced ISO
+   head = renders a group sub-header band instead of a checklist row (sub = optional sub-line) */
+const S5=[
+ {c:"5.2.2.2",r:"Resistance to liquids — external side tested in IRM 901 oil (A) and salt water (B); change in mass per unit area not exceeding 100 g/m² at 70 °C.",iso:"ISO 1817"},
+ {c:"5.2.2.3",r:"Ozone resistance — no signs of cracking under 10× magnification after exposure.",iso:"ISO 3011"},
+ {c:"5.2.2.4",r:"Resistance to cold — satisfies the low-temperature bend test at −20 °C.",iso:"ISO 4675"},
+ {c:"5.2.2.5",r:"Tear resistance — result not less than F<sub>t</sub> = 0,375·d·(1,14p + 0,14), and F<sub>t</sub> ≥ 75 N in all cases. <span class='thr'>Required F<sub>t</sub> = <b id='t_Ft'>—</b> N</span>",iso:"ISO 4674-1 method B"},
+ {c:"5.2.2.6",r:"Coating adhesion — minimum adhesion value <span class='thr'>≥ <b>40 N</b> per 25 mm</span>.",iso:"ISO 2411"},
+ {c:"5.2.2.7",r:"Seam strength — static load F<sub>s</sub> = 3,75·d·(1,14p + 0,14) applied at 60 °C over 4 h; no slipping or failure at any part of the seam. <span class='thr'>Required F<sub>s</sub> = <b id='t_Fs'>—</b> N</span>."},
+ {c:"5.3",r:"Wood / plywood — timber and plywood comply; waterproof and boil-proof bonding; exposed surfaces weather-protected; edges and end grain sealed.",iso:"ISO 12215-3"},
+ {c:"5.4",r:"Metal parts — types of metal comply.",iso:"ISO 12215-3 cl.4"},
+ {c:"5.5",r:"Glass-reinforced plastics — resins, reinforcements and laminates protected against the marine environment (see 7.15)."},
+ {c:"5.7",r:"Foam-filled buoyancy material — after temperature cycling, water absorption and fuel resistance: buoyancy reduction <span class='thr'>≤ <b>16%</b> (diesel) / ≤ <b>5%</b> (all others)</span>; no shrinking, cracking, swelling or dissolution."}
+];
+const S6=[
+ {c:"6.2.2",r:"Bonded buoyancy-tube / hull fittings — loaded 1 min with no loss of airtightness or water integrity. Strong points per ISO 15084; all other attachments <span class='thr'>2 kN</span>.",iso:"ISO 15084"},
+ {c:"6.3.1",r:"Inflation valves — corrosion-resistant, accessible on land and water, capped with captive cap, cannot be torn off; controlled pressure reduction/measurement possible."},
+ {c:"6.3.2",r:"Deflation — manual; deflating one compartment does not cause air loss from remaining compartments."},
+ {c:"6.4",r:"Transom / motor mount — designed to withstand output power, torque and mass of the motor(s).",iso:"ISO 12215-5, -6"},
+ {c:"6.5",r:"Hull interior drainage — drain plug for the bilge (where not foam-filled); means to prevent accidental discharge of oily waste."},
+ {c:"6.6",r:"Remote steering — conforms to a listed steering standard; single inboard engine has emergency steering at reduced speed; Type X steering approved by the manufacturer; consoles meet 7.16.",iso:"ISO 8847 / 8848 / 10592"},
+ {c:"6.7",r:"Towing, anchoring &amp; mooring strong points present.",iso:"ISO 15084"},
+ {c:"6.8",r:"Seating &amp; attachment — meets 7.16 strength; supports spinal-neutral alignment and prevents falls; buoyancy tubes not used as seating.",iso:"ISO 14946 / ISO 15085 cl.15"},
+ {c:"6.9",r:"Electrical installations — conform, as applicable.",iso:"ISO 10133 / 13297"},
+ {c:"6.10.1",r:"Inboard engine spaces — enclosure separated from living quarters; parts needing service accessible; sound insulation non-fuel-absorbent and non-combustion-sustaining.",iso:"ISO 9094"},
+ {c:"6.10.2",r:"Fuel systems / fixed tanks — conform; Type X fitted with a permanent fuel system including permanent tank(s).",iso:"ISO 10088 / 21487"},
+ {c:"6.11",r:"Ventilation of petrol motor / tank compartments (free spaces &gt; 3 L) — conforms.",iso:"ISO 11105"},
+ {c:"6.12",r:"Lifting devices — design load <span class='thr'>6 × m<sub>T</sub> = <b id='t_lift6'>—</b> kg</span>; type-tested at <span class='thr'>2 × m<sub>T</sub> = <b id='t_lift2'>—</b> kg</span> with no permanent deformation; use described in owner's manual."},
+ {c:"6.13",r:"Fire protection — conforms.",iso:"ISO 9094"},
+ {c:"6.14",r:"Openings in hull, deck or superstructure — windows, portlights, doors, hatches comply; sea cocks comply.",iso:"ISO 12216 / ISO 9093"},
+ {c:"6.15",r:"Gas systems — LPG for domestic use (where fitted) comply.",iso:"ISO 10239"},
+ {c:"6.16",r:"Navigation lights (where fitted) comply with international or national regulations of the country of sale."},
+ {c:"6.17",r:"Discharge prevention — constructed to prevent accidental discharge of pollutants; holding tanks (or provision) for permanent toilets; toilet through-hull fitted with closable seacocks.",iso:"ISO 8099 / ISO 9093"},
+ {c:"6.18",r:"Noise emissions (inboard, no integral exhaust) — within national or international requirements."}
+];
+const S7=[
+ {c:"7.1",r:"Crew limit — does not exceed assigned seating or the limits imposed by 7.3, 7.4, 7.5 and 7.9."},
+ {c:"7.2",r:"Motor power — power fitted does not exceed P<sub>calc</sub> = L<sub>max</sub> × B<sub>max</sub> × &#8731;m<sub>LC</sub>, else 7.3 applies. Waterjet allowance +35% where selected. <span class='thr'>P<sub>calc</sub> = <b id='t_Pcalc'>—</b> kW · allowable <b id='t_Pallow'>—</b> kW · fitted <b id='t_Pfit'>—</b> kW</span>"},
+ {c:"7.3",r:"Maximal manoeuvring speed — determined by quick-turn or avoidance-line test for boats capable of ≥ 48 km/h (26 kn). Where limited, warning label (ISO 7010 W001) posted and a speed-measuring device installed. <span class='thr'>Test required: <b id='t_man'>—</b></span>",iso:"ISO 7010:2011 W001"},
+ {c:"7.4",r:"Static stability &amp; freeboard — complies per Table 3 for this type/category. <span class='thr'><b id='t_stab'>—</b></span>",iso:"ISO 12217-1:2013"},
+ {c:"7.5",r:"Maximum load capacity — determined (stability/buoyancy per 7.4 and 7.6).",iso:"ISO 14946"},
+ {c:"7.6.1",r:"Total buoyant volume — <span class='thr'>V &gt; 1,33 × m<sub>LDC</sub>/1000 = <b id='t_Vmin'>—</b> m³</span>; buoyancy tube not less than 50% of required total <span class='thr'>(≥ <b id='t_tubeReq'>—</b> m³)</span>."},
+ {c:"7.6.3",r:"Level flotation when swamped — floats with ≤ 10° trim from loaded waterline and with more than two thirds of the tube top and transom above water."},
+ {c:"7.7",r:"Compartmentation — <span class='thr'>N ≥ 5 (is <b id='t_N'>—</b>)</span>; each compartment <span class='thr'>≤ 4 m (longest <b id='t_Lcomp'>—</b> m)</span>; each within ±20% of V/N <span class='thr'>= <b id='t_meanComp'>—</b> m³</span>."},
+ {c:"7.8",r:"Nominal pressures — specified per compartment; stated in owner's manual and on builder's plate; expressed in pascals (bar/psi optional)."},
+ {c:"7.9.2.2",r:"Heat test — element inflated to 1,2× working pressure, 60 °C for 6 h, then passes airtightness (7.9.2.4)."},
+ {c:"7.9.2.3",r:"Overpressure test — each compartment to 1,5× nominal for 30 min; no damage or rupture; then airtightness."},
+ {c:"7.9.2.4",r:"Airtightness test — after 24 h the pressure drop <span class='thr'>≤ <b>20%</b></span> in any compartment (temperature/atmospheric corrections applied)."},
+
+ /* ---- 7.10 Man-overboard: ISO 6185-4 §7.10 requires full compliance with ISO 15085:2003.
+         Clause numbers in this block are ISO 15085 clauses, not ISO 6185-4. ---- */
+ {head:"7.10 &nbsp; Man-overboard prevention &amp; recovery",
+  sub:"ISO 6185-4 §7.10 requires full compliance with <b>ISO 15085:2003</b>. Every clause number in this block is an <b>ISO 15085</b> clause — not ISO 6185-4. The RIB is a non-sailing boat, so safety devices are chosen from <b>ISO 15085 Table 3</b> by design category and hull length (the 8,5 m split): the builder selects the option, and devices not part of the chosen option are marked N/A. Jack-line points (device 7) are for sailing boats only."},
+
+ {c:"15085 · 4.1",r:"Working deck defined by the builder — safe access provided to the steering (including emergency steering), strong points, sail/handling area where relevant, the interior and the engine compartment. Working-deck area shown by text or sketch in the owner's manual.",iso:"ISO 15085 · general (cl. 4)"},
+ {c:"15085 · 4.3",r:"Minimum working-deck width at the outer edge — free, continuous and not angled more than 15° from horizontal when upright: <span class='thr'>≥ <b>150 mm</b> cat A/B · ≥ <b>120 mm</b> cat C · ≥ <b>100 mm</b> cat D</span>.",iso:"ISO 15085 · general (cl. 4)"},
+ {c:"15085 · 4.4",r:"Continuity of the working deck — working-deck areas connected (passage through the interior allowed); steps higher than <span class='thr'><b>500 mm</b></span> and obstacles higher or longer than 500 mm avoided.",iso:"ISO 15085 · general (cl. 4)"},
+
+ {c:"15085 · 7",r:"<b>Device 1 — Slip-resistant surface</b> (required, all boats). Working-deck areas slip-resistant; spacing between patches <span class='thr'>≤ <b>75 mm</b> non-glazed · ≤ <b>500 mm</b> glazed</span>. Trampolines/nets forming part of the deck are slip-resistant and support 3 000 N/m².",iso:"ISO 15085 · device 1"},
+ {c:"15085 · 8",r:"<b>Device 2 — Foot-stop</b> (per selected option). Height above adjacent deck (non-sailing) <span class='thr'>≥ <b>25 mm</b> cat A/B · ≥ <b>20 mm</b> cat C</span>; internal face ≤ 30° from vertical (or angled surface ≥ 20° from horizontal on cat C/D); vertical clearance ≤ 40 mm; gaps ≤ 100 mm.",iso:"ISO 15085 · device 2"},
+ {c:"15085 · 9",r:"<b>Device 3 — Handholds</b> (required, all boats). Fitted within 300 mm of the outer edge → placed at least 350 mm above deck; maximum spacing along the outer route <span class='thr'>≤ <b>1,5 m</b></span>; each withstands a horizontal force of <span class='thr'><b>1 500 N</b></span>.",iso:"ISO 15085 · device 3"},
+ {c:"15085 · 10, 11",r:"<b>Device 4 — Low guard-rail / low guard-line</b> (h ≥ 450 mm, per selected option). Surrounds the outer edges of the working deck; intermediate line and gaps per cl. 10; rail/support strength per cl. 11.",iso:"ISO 15085 · device 4"},
+ {c:"15085 · 10–12",r:"<b>Device 5 — High guard-rail / high guard-line</b> (h ≥ 600 mm, per selected option). Intermediate line gap ≤ 300 mm; rail strength <span class='thr'><b>280 N</b> (≤ 50 mm deflection, no permanent set) &amp; <b>560 N</b> no break</span>; stanchion spacing ≤ 2,2 m; guard-line ultimate strength <span class='thr'><b>13 000 N</b> cat A · <b>9 000 N</b> cat B/C</span>.",iso:"ISO 15085 · device 5 (cl. 11, 12)"},
+ {c:"15085 · 13",r:"<b>Device 6 — Hooking points</b> (per selected option). Located within 1 m of the main access hatch/door, within 2 m of every outside steering position, and no more than 3 m apart; accept a 15 mm hook circle; strength <span class='thr'><b>3 600 N</b> cat C · <b>6 000 N</b> cat A/B</span>.",iso:"ISO 15085 · device 6"},
+ {c:"15085 · 14",r:"<b>Device 7 — Jack-line attachment points</b> — required for <i>sailing</i> boats only (ISO 15085 Table 4). Not applicable to a Type IX/X RIB — mark N/A.",iso:"ISO 15085 · device 7 (sailing only)"},
+ {c:"15085 · 15",r:"<b>Device 8 — Body support on high-speed boats</b> (if high-speed: maximum speed &gt; 10·√L<sub>H</sub> or 25 kn, whichever is greater). Either one handhold plus body support, or two handholds grippable together ≥ 200 mm apart; for a seated occupant the support is ≥ 120 mm above the seat.",iso:"ISO 15085 · device 8"},
+ {c:"15085 · 16",r:"<b>Device 9 — Means of reboarding</b> (required, all boats). Reboarding from the water without assistance; if a ladder, the lowest step is <span class='thr'>≥ <b>300 mm</b> below the waterline</span> (minimum sailing condition); readily accessible and usable when in place.",iso:"ISO 15085 · device 9"},
+ {c:"15085 · 17",r:"Owner's-manual items driven by ISO 15085 — working-deck sketch (4.1); guard-line inspection/replacement for UV and chafe (12.1, where guard-lines are fitted); description of the means of reboarding (cl. 16).",iso:"ISO 15085 · cl. 17"},
+
+ {c:"7.11",r:"Field of vision from the helm position — conforms.",iso:"ISO 11591"},
+ {c:"7.12",r:"Liferaft stowage — provision for liferaft(s) able to carry the crew limit; canister mounted ready, soft bag readily available."},
+ {c:"7.13",r:"Self-bailing — cockpit self-drains in <span class='thr'>&lt; 5 min</span> with no more than <span class='thr'>100 mm</span> residual water (test or calc).",iso:"ISO 11812"},
+ {c:"7.14",r:"Buoyancy-tube attachment strength (type test) — drop/slide test passed; no visible damage or tearing. <span class='thr'>Test mass m<sub>t</sub> = <b id='t_mt'>—</b> kg</span> (method A)."},
+ {c:"7.15",r:"Strength of the rigid structure (type test) — conforms and passes the performance tests (Hs 1 200 mm).",iso:"ISO 12215-5 / ISO 6185-3:2001 8.3, 8.5"},
+ {c:"7.16",r:"Strength of principal factory-fitted accessories — seats/consoles pass the 225 kg swing test (method A) or 2 kN load in all directions (method B); no evident damage."}
+];
+const S810=[
+ {c:"8",r:"Builder's plate(s) — printed or engraved plate fitted; craft identification number (WIN) shown separately from the plate.",iso:"ISO 14945 / ISO 10087"},
+ {c:"9",r:"Owner's manual — supplied in suitable language(s); covers assembly, inflation, lifting, seating, steering, battery, fuel; drying/storage/servicing guidance; completion-process warning and warnings (a)–(h); unladen weight and handling characteristics stated.",iso:"ISO 10240"},
+ {c:"10",r:"Standard equipment — repair outfit with instructions; pump for maintaining pressure; bow rope (painter) permanently attached, <span class='thr'>length ≥ L<sub>H</sub> = <b id='t_ropeLen'>—</b> m</span>, <span class='thr'>strength ≥ 10 × m<sub>LDC</sub> = <b id='t_rope'>—</b> N</span>."}
+];
+
+/* ---------- IMCI review of project #14389 (WR-880): documents received + findings, keyed by clause ---------- */
+const REVIEW={
+ "5.5":{d:["D2","D4"]},
+ "5.7":{d:["D5"],f:["F3"],s:"high"},
+ "6.4":{d:["D3"]},
+ "6.6":{f:["F4"],s:"high"},
+ "6.10.2":{d:["D9"],f:["F11"],s:"med"},
+ "6.11":{d:["D7","D8"],f:["F2"],s:"high"},
+ "6.12":{f:["F14"]},
+ "6.13":{f:["F9"],s:"med"},
+ "7.2":{d:["D3"],f:["F1"],s:"high"},
+ "7.3":{d:["D2","D3"],f:["F1"],s:"high"},
+ "7.4":{f:["F13","F16"]},
+ "7.6.1":{d:["D5"],f:["F3"],s:"high"},
+ "7.12":{f:["F12"],s:"med"},
+ "7.13":{d:["D6"],f:["F7"],s:"med"},
+ "7.14":{f:["F6"],s:"med"},
+ "7.15":{d:["D2","D4"],f:["F8","F16"],s:"med"},
+ "7.16":{f:["F13"]},
+ "15085 · 4.1":{f:["F5","F10"]},
+ "15085 · 8":{f:["F10"],s:"med"},
+ "15085 · 10, 11":{f:["F10"],s:"med"},
+ "15085 · 10–12":{f:["F10"],s:"med"},
+ "15085 · 13":{f:["F10"],s:"med"},
+ "8":{f:["F5","F13"]},
+ "9":{f:["F13"]},
+ "10":{f:["F13"]}
+};
+["5.2.2.2","5.2.2.3","5.2.2.4","5.2.2.5","5.2.2.6","5.2.2.7","7.9.2.2","7.9.2.3","7.9.2.4","7.5","7.7"].forEach(c=>{REVIEW[c]=REVIEW[c]||{f:["F13"]};});
+REVIEW["7.7"].f.push("F3");
+/* Clauses verified by IMCI on Annex III CAIIIGEMI002 (23 Mar 2026) — essential requirement covering each */
+const VERIFIED={"5.5":"3.1 Structure","6.4":"3.1 Structure","7.15":"3.1 Structure","7.4":"3.2 Stability & freeboard",
+ "7.6.1":"3.3 Buoyancy & flotation","7.6.3":"3.3 Buoyancy & flotation","7.7":"3.3 Buoyancy & flotation",
+ "6.14":"3.4 Openings","6.5":"3.5 Flooding","7.13":"3.5 Flooding","7.1":"3.6 Max. recommended load","7.5":"3.6 Max. recommended load",
+ "6.7":"3.9 Anchoring, mooring & towing"};
+const VNOTE="Verified by IMCI on Annex III";
+/* findings closed or superseded by Annex III verification */
+for(const c in VERIFIED){const r=REVIEW[c]; if(r&&r.f){r.f=r.f.filter(x=>!["F3","F8","F13","F16"].includes(x)); if(!r.f.length)delete r.f; if(c!=="6.4")delete r.s;}}
+REVIEW["7.13"].f=["F7"]; REVIEW["7.13"].s="low";
+REVIEW["5.5"].d=["D2","D4","D10"]; REVIEW["6.4"].f=["F1"]; REVIEW["6.4"].s="high";
+
+/* ---------- render ---------- */
+let idc=0;
+function evLine(c){
+  const r=REVIEW[c]; if(!r)return "";
+  const d=(r.d||[]).map(x=>`<span class="evchip" title="Document received">${x}</span>`).join("");
+  const f=(r.f||[]).map(x=>`<span class="sev ${r.s||'low'}" title="IMCI finding">IMCI ${x}</span>`).join(" ");
+  return `<div class="evline">${d?`<span class="iso">Received:</span>${d}`:""}${f}</div>`;
+}
+function renderRow(it){
+  if(it.head){
+    return `<div class="grouphead"><h4>${it.head}</h4>${it.sub?`<div class="gs">${it.sub}</div>`:""}</div>`;
+  }
+  const id="it"+(idc++);
+  const rv=REVIEW[it.c];
+  const vf=VERIFIED[it.c];
+  const cls=vf?' verified':(rv&&rv.s&&rv.s!=='low'?' flag-'+rv.s:'');
+  return `<div class="item${cls}${vf&&rv&&rv.s==='high'?' flag-high':''}" data-id="${id}" data-c="${it.c}">
+    <div class="clause">${it.c}</div>
+    <div class="req">${it.r}${it.iso?`<div class="iso">${it.iso}</div>`:""}${vf?`<div class="verline"><span class="vbadge">✓ ${VNOTE}</span><span class="iso">CAIIIGEMI002 · ${vf}</span></div>`:""}${evLine(it.c)}</div>
+    <div class="ctl">
+      <div class="seg">
+        <button class="pass" onclick="setStat('${id}','pass',this)">Pass</button>
+        <button class="fail" onclick="setStat('${id}','fail',this)">Fail</button>
+        <button class="na" onclick="setStat('${id}','na',this)">N/A</button>
+      </div>
+      <input class="rn" placeholder="note / evidence ref" oninput="">
+    </div>
+  </div>`;
+}
+function fill(id,arr){document.getElementById(id).innerHTML=arr.map(renderRow).join("");}
+fill("s5",S5);fill("s6",S6);fill("s7",S7);fill("s810",S810);
+
+const status={};
+function setStat(id,val,btn){
+  const seg=btn.parentElement;
+  [...seg.children].forEach(b=>b.classList.remove("on"));
+  if(status[id]===val){status[id]=null;}
+  else{status[id]=val;btn.classList.add("on");}
+  updateSummary();saveState();
+}
+function clearStatuses(){
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('input.rn').forEach(i=>i.value='');
+  for(const k in status)status[k]=null;
+  updateSummary();saveState();
+}
+function updateSummary(){
+  let p=0,f=0,n=0;const tot=document.querySelectorAll('.item').length;
+  for(const k in status){if(status[k]==='pass')p++;else if(status[k]==='fail')f++;else if(status[k]==='na')n++;}
+  document.getElementById('sumPass').textContent=p;
+  document.getElementById('sumFail').textContent=f;
+  document.getElementById('sumNa').textContent=n;
+  document.getElementById('sumPend').textContent=tot-p-f-n;
+  document.getElementById('sumTot').textContent=tot;
+}
+updateSummary();
+
+/* ---------- collapse ---------- */
+function toggle(h){h.parentElement.classList.toggle('collapsed');}
+function expandAll(x){document.querySelectorAll('section.card').forEach(c=>{if(x)c.classList.remove('collapsed');else if(c.id!=='sec-data')c.classList.add('collapsed');});}
+
+/* ---------- formulas ---------- */
+function num(id){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;}
+function fmt(v,d=3){return v==null?'—':Number(v.toFixed(d)).toLocaleString('en-GB');}
+function set(id,txt){const e=document.getElementById(id);if(e)e.textContent=txt;}
+function badge(id,cls,txt){const e=document.getElementById(id);if(e){e.className='badge '+cls;e.textContent=txt;}}
+
+/* category is paired to boat type: Type IX = C/D, Type X = B */
+function syncCategory(){
+  const t=document.getElementById('boatType').value;
+  const sel=document.getElementById('designCat');
+  const cur=sel.value;
+  const opts = t==='X'
+    ? [['B','B — offshore (Hs ≤ 4 m, BF ≤ 8)']]
+    : [['C','C — inshore (Hs ≤ 2 m, BF ≤ 6)'],['D','D — sheltered (Hs ≤ 0,3 m, BF ≤ 4)']];
+  sel.innerHTML=opts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('');
+  sel.value = opts.some(o=>o[0]===cur)?cur:opts[0][0];
+}
+
+function recalc(){
+  const mLDC=num('mLDC'), mT=num('mT'), LH=num('LH'), N=num('N'),
+        Vtot=num('Vtotal'), Vtube=num('Vtube'), LT=num('LT'), LSTS=num('LSTS'),
+        Lcomp=num('Lcomp'), top=num('topSpeed'), type=document.getElementById('boatType').value;
+
+  // required buoyant volume
+  let Vmin=null; if(mLDC!=null){Vmin=1.33*mLDC/1000; set('o_Vmin',fmt(Vmin)); set('t_Vmin',fmt(Vmin));}
+  else{set('o_Vmin','—');set('t_Vmin','—');}
+  if(Vmin!=null&&Vtot!=null){badge('b_V',Vtot>Vmin?'ok':'no',Vtot>Vmin?'PASS':'FAIL');}else badge('b_V','na','—');
+
+  // tube ≥ 50% of required
+  let tubeReq=null; if(Vmin!=null){tubeReq=0.5*Vmin;set('o_tubeReq',fmt(tubeReq));set('t_tubeReq',fmt(tubeReq));}
+  else{set('o_tubeReq','—');set('t_tubeReq','—');}
+  if(tubeReq!=null&&Vtube!=null){badge('b_tube',Vtube>=tubeReq?'ok':'no',Vtube>=tubeReq?'PASS':'FAIL');}else badge('b_tube','na','—');
+
+  // compartments
+  set('o_N',N==null?'—':N); set('t_N',N==null?'—':N);
+  if(N!=null)badge('b_N',N>=5?'ok':'no',N>=5?'PASS':'FAIL');else badge('b_N','na','—');
+  set('o_Lcomp',Lcomp==null?'—':fmt(Lcomp,2)); set('t_Lcomp',Lcomp==null?'—':fmt(Lcomp,2));
+  if(Lcomp!=null)badge('b_Lcomp',Lcomp<=4?'ok':'no',Lcomp<=4?'PASS':'FAIL');else badge('b_Lcomp','na','—');
+  if(Vtot!=null&&N!=null&&N>0){const mc=Vtot/N;set('o_meanComp',fmt(mc));set('t_meanComp',fmt(mc));
+    set('o_compBand',fmt(0.8*mc)+' – '+fmt(1.2*mc)+' m³');}
+  else{set('o_meanComp','—');set('t_meanComp','—');set('o_compBand','—');}
+
+  // attachment mass
+  if(mLDC!=null&&LT!=null&&LT>0&&LSTS!=null){const mt=0.75*(LSTS/LT)*mLDC;set('o_mt',fmt(mt,1));set('t_mt',fmt(mt,1));}
+  else{set('o_mt','—');set('t_mt','—');}
+
+  // lifting
+  if(mT!=null){set('o_lift6',fmt(6*mT,0));set('o_lift2',fmt(2*mT,0));set('t_lift6',fmt(6*mT,0));set('t_lift2',fmt(2*mT,0));}
+  else{set('o_lift6','—');set('o_lift2','—');set('t_lift6','—');set('t_lift2','—');}
+
+  // bow rope
+  if(mLDC!=null){set('o_rope',fmt(10*mLDC,0));set('t_rope',fmt(10*mLDC,0));}else{set('o_rope','—');set('t_rope','—');}
+  set('o_ropeLen',LH==null?'—':fmt(LH,2)); set('t_ropeLen',LH==null?'—':fmt(LH,2));
+
+  // manoeuvring speed
+  let manTxt='—',manCls='na';
+  if(top!=null){const req=top>=48;manTxt=req?'REQUIRED':'not required';manCls=req?'chk':'ok';}
+  badge('b_man',manCls,manTxt); set('t_man',manTxt);
+
+  // stability route + category B Notified Body warning
+  const cat=document.getElementById('designCat').value;
+  let stab = type==='X'
+    ? 'Type X: offset load 6.2, resistance to waves/wind 6.3.2 & 6.3.3 (per ISO 12217-1)'
+    : 'Type IX: offset load 6.2, heel due to wind 6.4 where A_LV/(L_H·B_H) ≥ 0,5';
+  if(cat==='B') stab += ' — Notified Body assessment required.';
+  set('o_stab',stab); set('t_stab',stab);
+  document.getElementById('catBwarn').classList.toggle('show', cat==='B');
+
+  // motor power  Pcalc = Lmax × Bmax × cbrt(mLC)
+  const Lmax=num('Lmax'), Bmax=num('Bmax'), mLC=num('mLC'), Pf=num('Pfitted'),
+        jet=document.getElementById('drive').value==='jet';
+  if(Lmax!=null&&Bmax!=null&&mLC!=null){
+    const Pc=Lmax*Bmax*Math.cbrt(mLC);
+    const allow=jet?Pc*1.35:Pc;
+    set('o_Pcalc',fmt(Pc,1)); set('t_Pcalc',fmt(Pc,1)); set('t_Pallow',fmt(allow,1));
+    set('o_Pallow',jet?'· allowable '+fmt(allow,1)+' kW':'');
+    if(Pf!=null)badge('b_P',Pf<=allow?'ok':'chk',Pf<=allow?'within':'7.3 applies');
+    else badge('b_P','na','—');
+  }else{set('o_Pcalc','—');set('t_Pcalc','—');set('t_Pallow','—');set('o_Pallow','');badge('b_P','na','—');}
+  set('t_Pfit',Pf==null?'—':fmt(Pf,1));
+
+  // material minimums  d in mm, p in bar
+  const d=num('dtube'), p=num('pnom');
+  if(d!=null&&p!=null){
+    let ft=0.375*d*(1.14*p+0.14); ft=Math.max(ft,75);
+    const fs=3.75*d*(1.14*p+0.14);
+    set('o_Ft',fmt(ft,0)); set('t_Ft',fmt(ft,0));
+    set('o_Fs',fmt(fs,0)); set('t_Fs',fmt(fs,0));
+  }else{set('o_Ft','—');set('t_Ft','—');set('o_Fs','—');set('t_Fs','—');}
+}
+recalc();
+
+/* ---------- persistence (browser local storage) ---------- */
+const LS_KEY='iso6185_4_gemini_wr880_14389_v1';
+function collectState(){
+  const s={fields:{},notes:{},status:{}};
+  document.querySelectorAll('input[id],select[id]').forEach(el=>{
+    if(el.id==='importFile')return;
+    s.fields[el.id]= el.type==='checkbox' ? el.checked : el.value;
+  });
+  document.querySelectorAll('.item').forEach(it=>{
+    const inp=it.querySelector('input.rn'); if(inp)s.notes[it.dataset.id]=inp.value;
+  });
+  for(const k in status)if(status[k])s.status[k]=status[k];
+  return s;
+}
+function saveState(){try{localStorage.setItem(LS_KEY,JSON.stringify(collectState()));}catch(e){}}
+function applyState(s){
+  if(!s)return;
+  if(s.fields)for(const id in s.fields){const el=document.getElementById(id);if(el){if(el.type==='checkbox')el.checked=s.fields[id];else el.value=s.fields[id];}}
+  for(const k in status)status[k]=null;
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.remove('on'));
+  if(s.status)for(const k in s.status)status[k]=s.status[k];
+  document.querySelectorAll('.item').forEach(it=>{
+    const id=it.dataset.id, v=status[id];
+    if(v){const btn=it.querySelector('.seg button.'+v);if(btn)btn.classList.add('on');}
+    if(s.notes&&s.notes[id]!=null){const inp=it.querySelector('input.rn');if(inp)inp.value=s.notes[id];}
+  });
+  recalc();updateSummary();
+}
+function loadState(){
+  let raw;try{raw=localStorage.getItem(LS_KEY);}catch(e){return;}
+  if(!raw)return; let s;try{s=JSON.parse(raw);}catch(e){return;} applyState(s);
+}
+function exportState(){
+  const model=(document.getElementById('model').value||'assessment').replace(/[^A-Za-z0-9_-]+/g,'_');
+  const blob=new Blob([JSON.stringify(collectState(),null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='ISO6185-4_WR-880_#14389_'+model+'_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(a.href);
+}
+function importState(inp){
+  const f=inp.files&&inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{try{applyState(JSON.parse(e.target.result));saveState();}catch(err){alert('Could not read that file.');}inp.value='';};
+  r.readAsText(f);
+}
+
+/* ---------- WR-880 submission as received from Gemini Marine (project #14389, checklist printed 23 Sep 2026) ---------- */
+const SUB_FIELDS={projHead:"WR-880",model:"WR-880",win:"",surveyor:"",assessDate:"2026-08-13",stage:"Post-completion (consoles/seats)",
+  boatType:"X",designCat:"B",drive:"prop",LH:"8.80",Lmax:"8.80",Bmax:"2.95",mLC:"1915",mLDC:"4866",mT:"",Pfitted:"2",topSpeed:"40",
+  Vtotal:"6.48",Vtube:"4.52",N:"7",LT:"8.80",LSTS:"1.0",Lcomp:"2.75",dtube:"570",pnom:"0.21"};
+const SUB_NA=["6.6","6.10.1","6.12","6.13","6.15","15085 · 8","15085 · 10, 11","15085 · 10–12","15085 · 13","15085 · 14","7.12"];
+const T35="DATA & STANDARDS\\35 - ISO Testing Pics & Video", A3="ANNEX III's\\WR 880\\WR-880 Annex III Update_2026", OM="See Owners Manual";
+const SUB_NOTES={"5.2.2.2":T35,"5.2.2.3":T35,"5.2.2.4":T35,"5.2.2.5":T35,"5.2.2.6":T35,"5.2.2.7":T35,"5.3":T35,"5.4":T35,"5.5":T35,"5.7":T35,
+  "6.2.2":T35,"6.3.1":T35,"6.3.2":T35,"6.4":T35,"6.5":T35+", 390-000-000 - WAVERIDER SERIES_Drainage Plane_Rev_3.pdf",
+  "6.7":"ISO15084 - Load Condition Calculations_Rev_2.xlsx","6.8":"18_ISO 15085_2024_Deck Nut Attachments - Deck Hatch, Deck and Bonded Deck.pdf",
+  "6.11":"03_STANDARD PRODUCTS\\WR 880\\100 HULL, DECK & BULKHEAD\\03_WR-880 - VENTILATION CALCULATIONS\\PDF's",
+  "7.2":A3,"7.3":"Put Sticker","7.4":A3,"7.5":A3,"7.6.1":A3,"7.6.3":A3,"7.7":A3,"7.9.2.2":T35,"7.9.2.3":T35,"7.9.2.4":T35,
+  "15085 · 4.1":OM,"15085 · 4.3":OM,"15085 · 7":"See Non-skid Surface","15085 · 15":OM,"15085 · 16":OM,"15085 · 17":OM,
+  "7.11":"See Field of Vision","7.13":"See Deck Drainage","7.14":"See Annex III & Buoyancy","7.16":T35,
+  "8":"See Builders Plate","9":OM,"10":"See pics - Peter"};
+function loadSubmission(){
+  const s={fields:{},notes:{},status:{}};
+  for(const k in SUB_FIELDS)s.fields[k]=SUB_FIELDS[k];
+  // keep category list consistent with Type X before values are applied
+  document.getElementById('boatType').value='X'; syncCategory();
+  document.querySelectorAll('.item').forEach(it=>{
+    const c=it.dataset.c, id=it.dataset.id;
+    s.status[id]=SUB_NA.includes(c)?'na':'pass';
+    s.notes[id]=VERIFIED[c]?VNOTE+" (CAIIIGEMI002, "+VERIFIED[c]+")":(SUB_NOTES[c]||'');
+  });
+  applyState(s); saveState();
+}
+
+/* ---------- init order: load saved data (or the WR-880 submission on first visit), then fill defaults ---------- */
+(function(){let has=false;try{has=!!localStorage.getItem(LS_KEY);}catch(e){} if(!has){loadSubmission();}})();
+loadState();
+/* make sure Annex III-verified rows carry the verification note, even in previously saved entries */
+document.querySelectorAll('.item').forEach(it=>{const v=VERIFIED[it.dataset.c];if(!v)return;const inp=it.querySelector('input.rn');
+  if(inp&&inp.value.indexOf(VNOTE)<0){inp.value=VNOTE+" (CAIIIGEMI002, "+v+")"+(inp.value?" · "+inp.value:"");}});
+saveState();
+syncCategory();
+if(!document.getElementById('assessDate').value)document.getElementById('assessDate').valueAsDate=new Date();
+recalc();
+document.addEventListener('input',saveState);
+document.addEventListener('change',saveState);
+</script>
+</body>
+</html>
